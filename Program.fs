@@ -31,7 +31,27 @@ let workaround (id: string) : HttpHandler =
             let httpClient = factory.CreateClient("workaround")
             match httpClient.BaseAddress |> Option.ofObj with
             | Some baseAddress ->
-                return! text $"Poc {id} \n {baseAddress.ToString()} (as expected)" next ctx
+                let asString = baseAddress.ToString()
+                if asString.Contains("microsoft") then
+                    return! text $"Poc {id} \n {baseAddress.ToString()} (as expected)" next ctx
+                else
+                    return! text $"Poc {id} \n {baseAddress.ToString()} (this is weird)" next ctx
+            | None ->
+                return! text $"Poc {id} \n null (expected a URL)" next ctx
+        }
+
+let workaround2 (id: string) : HttpHandler =
+    fun (next: HttpFunc) (ctx: HttpContext) ->
+        task {
+            let factory = ctx.GetService<IHttpClientFactory>()
+            let httpClient = factory.CreateClient("workaround2")
+            match httpClient.BaseAddress |> Option.ofObj with
+            | Some baseAddress ->
+                let asString = baseAddress.ToString()
+                if asString.Contains("github") then
+                    return! text $"Poc {id} \n {baseAddress.ToString()} (as expected)" next ctx
+                else
+                    return! text $"Poc {id} \n {baseAddress.ToString()} (this is weird)" next ctx
             | None ->
                 return! text $"Poc {id} \n null (expected a URL)" next ctx
         }
@@ -43,6 +63,7 @@ let webApp =
               [ route "/" >=> redirectTo false "/poc/demo"
                 routef "/poc/%s" poc
                 routef "/workaround/%s" workaround
+                routef "/workaround2/%s" workaround2
                 ]
           setStatusCode 404 >=> text "Not Found" ]
 
