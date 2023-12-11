@@ -71,20 +71,12 @@ let errorHandler (ex: Exception) (logger: ILogger) =
     logger.LogError(ex, "An unhandled exception has occurred while executing the request.")
     clearResponse >=> setStatusCode 500 >=> text ex.Message
 
-let configureCors (builder: CorsPolicyBuilder) =
-    builder
-        .WithOrigins("http://localhost:5000", "https://localhost:5001")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-    |> ignore
-
 let configureApp (app: IApplicationBuilder) =
     let env = app.ApplicationServices.GetService<IWebHostEnvironment>()
 
     (match env.IsDevelopment() with
      | true -> app.UseDeveloperExceptionPage()
      | false -> app.UseGiraffeErrorHandler(errorHandler).UseHttpsRedirection())
-        .UseCors(configureCors)
         .UseStaticFiles()
         .UseGiraffe(webApp)
 
