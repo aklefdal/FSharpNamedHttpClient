@@ -81,20 +81,24 @@ let configureServices (services: IServiceCollection) =
     )
     |> ignore
 
+    services.AddHttpClient<HttpClient>(
+        "workaround2",
+        (fun httpClient -> httpClient.BaseAddress <- Uri("https://github.com"))
+    )
+    |> ignore
+
 let configureLogging (builder: ILoggingBuilder) =
     builder.AddConsole().AddDebug() |> ignore
 
 [<EntryPoint>]
 let main args =
     let contentRoot = Directory.GetCurrentDirectory()
-    let webRoot = Path.Combine(contentRoot, "WebRoot")
 
     Host
         .CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(fun webHostBuilder ->
             webHostBuilder
                 .UseContentRoot(contentRoot)
-                .UseWebRoot(webRoot)
                 .Configure(Action<IApplicationBuilder> configureApp)
                 .ConfigureServices(configureServices)
                 .ConfigureLogging(configureLogging)
