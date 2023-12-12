@@ -33,11 +33,11 @@ let workaround (id: string) : HttpHandler =
             | Some baseAddress ->
                 let asString = baseAddress.ToString()
                 if asString.Contains("microsoft") then
-                    return! text $"Poc {id} \n {baseAddress.ToString()} (as expected)" next ctx
+                    return! text $"Workaraound {id} \n {baseAddress.ToString()} (as expected)" next ctx
                 else
-                    return! text $"Poc {id} \n {baseAddress.ToString()} (this is weird)" next ctx
+                    return! text $"Workaraound {id} \n {baseAddress.ToString()} (this is weird)" next ctx
             | None ->
-                return! text $"Poc {id} \n null (expected a URL)" next ctx
+                return! text $"Workaraound2 {id} \n null (expected a URL)" next ctx
         }
 
 let workaround2 (id: string) : HttpHandler =
@@ -49,11 +49,11 @@ let workaround2 (id: string) : HttpHandler =
             | Some baseAddress ->
                 let asString = baseAddress.ToString()
                 if asString.Contains("github") then
-                    return! text $"Poc {id} \n {baseAddress.ToString()} (as expected)" next ctx
+                    return! text $"Workaraound2 {id} \n {baseAddress.ToString()} (as expected)" next ctx
                 else
-                    return! text $"Poc {id} \n {baseAddress.ToString()} (this is weird)" next ctx
+                    return! text $"Workaraound2 {id} \n {baseAddress.ToString()} (this is weird)" next ctx
             | None ->
-                return! text $"Poc {id} \n null (expected a URL)" next ctx
+                return! text $"Workaraound2 {id} \n null (expected a URL)" next ctx
         }
 
 let webApp =
@@ -96,7 +96,7 @@ let configureServices (services: IServiceCollection) =
 
     services.AddHttpClient<HttpClient>(
         "workaround2",
-        (fun httpClient -> httpClient.BaseAddress <- Uri("https://github.com"))
+        Action<HttpClient>(fun httpClient -> httpClient.BaseAddress <- Uri("https://github.com"))
     )
     |> ignore
 
